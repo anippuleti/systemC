@@ -1,12 +1,12 @@
 Steps to install SystemC (version: 2.3.3) on linux machines
-  Download SystemC from https://accellera.org/downloads/standards/systemc
-  Extract the tar file and cd to systemc-2.3.3
-  Using CMake build scripts is easier.
-  Below are the steps I followed but please refer to cmake/INSTALL_USING_CMAKE file for details
-    For bash shell
-      export SYSTEMC_HOME=<installation path>
-    For csh shell
-      steenv SYSTEMC_HOME <installation path>
+ 1. Download SystemC from https://accellera.org/downloads/standards/systemc
+ 2. Extract the tar file and cd to systemc-2.3.3
+ 3. Using CMake build scripts is easier.
+ 4. Below are the steps I followed but please refer to cmake/INSTALL_USING_CMAKE file for details
+	For bash shell
+	      export SYSTEMC_HOME=<installation path>
+        For csh shell
+	      steenv SYSTEMC_HOME <installation path>
 
   For RELEASE version of shared library
 
