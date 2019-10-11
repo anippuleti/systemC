@@ -34,3 +34,23 @@ void Hello_world::incr_counter()
     counter = 0;
   }
 }
+
+void Hello_world::before_end_of_elaboration()
+{
+  std::cout << sc_core::sc_time_stamp() << " CB: before_end_of_elab" << std::endl;
+}
+
+void Hello_world::end_of_elaboration()
+{
+  std::cout << sc_core::sc_time_stamp() << " CB: end_of_elab" << std::endl;
+}
+
+void Hello_world::start_of_simulation()
+{
+  std::cout << sc_core::sc_time_stamp() << " CB: start_of_sim" << std::endl;
+}
+
+void Hello_world::end_of_simulation()
+{
+  std::cout << sc_core::sc_time_stamp() << " CB: end_of_sim" << std::endl;
+}

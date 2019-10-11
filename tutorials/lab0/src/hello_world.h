@@ -13,6 +13,11 @@ class Hello_world : public sc_core::sc_module {
   sc_core::sc_signal<bool>      reset_n;
   sc_core::sc_signal<unsigned> counter;
 
+  void before_end_of_elaboration() final;
+  void end_of_elaboration() final;
+  void start_of_simulation() final;
+  void end_of_simulation() final;
+
  private:
   void incr_counter();
   void say_hello() const;
