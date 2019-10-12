@@ -24,7 +24,7 @@ Steps to install SystemC (version: 2.3.3) on linux machines
     make -j check
     make -j install
 
-Either you can add systemC shared library path to LD_LIBRARY_PATH so that linker is able to locate the shared library or add it to gvv commandline with switch "rpath". It adds an entry to the binary and hints the loader to search additional path. I followed the second approach, please refer to makefile for exact command
+Either you can add systemC shared library path to LD_LIBRARY_PATH so that linker is able to locate the shared library or add it to gcc commandline with switch "rpath". It adds an entry to the binary and hints the loader to search additional path. I followed the second approach, please refer to makefile for exact command
 
 To build and execute lab0: make run
 
