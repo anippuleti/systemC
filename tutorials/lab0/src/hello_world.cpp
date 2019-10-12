@@ -27,7 +27,9 @@
 #include "sysc/kernel/sc_spawn_options.h"
 #include "sysc/kernel/sc_spawn.h"
 
-Hello_world::Hello_world(sc_core::sc_module_name const& s): sc_module{s}
+Hello_world::Hello_world(sc_core::sc_module_name const& s, unsigned vlevel):
+  sc_module{s},
+  verbosity{vlevel}
 {
   sc_core::sc_spawn_options m_spawn_opt;
   m_spawn_opt.dont_initialize();
@@ -44,22 +46,22 @@ Hello_world::Hello_world(sc_core::sc_module_name const& s): sc_module{s}
 
 void Hello_world::say_hello() const
 {
-  std::cout << sc_core::sc_time_stamp() << " Hello World\n";
+  std::cout << sc_core::sc_time_stamp() << " Hello World!\n";
 }
 
 void Hello_world::incr_counter()
 {
   using namespace std;
   using namespace sc_core;
-  if (reset_n)
+  if (reset_n && verbosity > 2)
     cout << sc_time_stamp() << " counter before incrementing: " << counter;
   if (!reset_n)
     counter = 0;
   else
     counter = counter + 1;
 
-  if (reset_n)
-    cout << " counter after incrementing: " << counter << "\n";
+  if (reset_n && verbosity > 2)
+    cout << " counter after incrementing: " << counter << '\n';
   if (counter == 16 && reset_n) {
     say_hello();
     counter = 0;
@@ -69,23 +71,28 @@ void Hello_world::incr_counter()
 void Hello_world::before_end_of_elaboration()
 {
   using namespace sc_core;
-  std::cout << sc_time_stamp() << " CB: before_end_of_elab" << std::endl;
+  if (verbosity > 1)
+    std::cout << sc_time_stamp() << " CB: before_end_of_elab" << '\n';
 }
 
 void Hello_world::end_of_elaboration()
 {
   using namespace sc_core;
-  std::cout << sc_time_stamp() << " CB: end_of_elab" << std::endl;
+  if (verbosity > 1)
+    std::cout << sc_time_stamp() << " CB: end_of_elab" << '\n';
 }
 
 void Hello_world::start_of_simulation()
 {
   using namespace sc_core;
-  std::cout << sc_time_stamp() << " CB: start_of_sim" << std::endl;
+  if (verbosity > 1)
+    std::cout << sc_time_stamp() << " CB: start_of_sim" << '\n';
 }
 
 void Hello_world::end_of_simulation()
 {
   using namespace sc_core;
-  std::cout << sc_time_stamp() << " CB: end_of_sim" << std::endl;
+  if (verbosity > 1)
+    std::cout << sc_time_stamp() << " CB: end_of_sim" << '\n';
 }
+

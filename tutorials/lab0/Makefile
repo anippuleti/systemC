@@ -2,11 +2,13 @@
 #MakeFile
 ###################
 
+VERBOSITY = 0
+
 run: build
-	./sim
+	./sim $(VERBOSITY)
 
 debug: debugbuild
-	./sim
+	./sim $(VERBOSITY)
 
 clean:
 	rm -Rf sim
