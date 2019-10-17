@@ -28,17 +28,23 @@
 
 #include "systemc"
 
-// Hello_world is module name
+// Hello_world is module, extended from name
 class Hello_world : public sc_core::sc_module {
  public:
 
+  //Constructor
   Hello_world(sc_core::sc_module_name const& s, unsigned vlevel);
 
+  //Destructor
+  ~Hello_world();
+
+  //SC signals
   sc_core::sc_signal<bool>       clk;
   sc_core::sc_signal<bool>      reset_n;
   sc_core::sc_signal<unsigned> counter;
 
-  //SystemC callbacks
+  //SystemC callbacks invoked at various stages of invocation
+  //Refer documentation for details
   void before_end_of_elaboration() final;
   void end_of_elaboration() final;
   void start_of_simulation() final;

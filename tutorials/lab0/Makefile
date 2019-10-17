@@ -2,7 +2,7 @@
 #MakeFile
 ###################
 
-VERBOSITY = 0
+VERBOSITY := 0
 
 run: build
 	./sim $(VERBOSITY)

@@ -32,6 +32,7 @@ void log(T&& val)
   std::cout << sc_core::sc_time_stamp() << " " << std::forward<T>(val) << '\n';
 }
 
+//Triggering reeset pulse
 void set_reset_pulse(sc_core::sc_signal<bool>& rst)
 {
   using namespace sc_core;
@@ -45,6 +46,7 @@ void set_reset_pulse(sc_core::sc_signal<bool>& rst)
   std::cout << sc_time_stamp() << " TB: Reset pulse completed" << '\n';
 }
 
+//Run specified number of clock cycles
 void incr_clk_n(unsigned cycles, sc_core::sc_signal<bool>& clk)
 {
   using namespace sc_core;
@@ -65,6 +67,8 @@ int sc_main(int argc, char* argv[])
   if (argc != 2)
     throw std::runtime_error{"Verbosity level must be passed. Legal range: [0, 3]"};
   std::string s{argv[1]};
+
+  //Constructing Hello world module.
   Hello_world hello("HELLO", std::stoi(s));
   std::cout << "\n\n";
 
