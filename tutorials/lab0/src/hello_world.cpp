@@ -51,12 +51,12 @@ Hello_world::Hello_world(sc_core::sc_module_name const& s, unsigned vlevel):
 
 Hello_world::~Hello_world() = default;
 
-void Hello_world::say_hello() const
+void Hello_world::say_hello() const noexcept
 {
   std::cout << sc_core::sc_time_stamp() << " Hello World!\n";
 }
 
-void Hello_world::incr_counter()
+void Hello_world::incr_counter() noexcept
 {
   using namespace std;
   using namespace sc_core;

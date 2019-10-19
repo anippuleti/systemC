@@ -52,8 +52,8 @@ class Hello_world : public sc_core::sc_module {
 
  private:
   unsigned verbosity;
-  void incr_counter();
-  void say_hello() const;
+  void incr_counter() noexcept;
+  void say_hello() const noexcept;
  
 };
 
