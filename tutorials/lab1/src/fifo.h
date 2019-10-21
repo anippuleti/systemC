@@ -74,10 +74,7 @@ class Fifo : public sc_core::sc_module {
 
 template<typename T, std::size_t V>
 Fifo<T, V>::Fifo(sc_core::sc_module_name const& s):
-  sc_core::sc_module(s)
-{
-
-}
+  sc_core::sc_module(s) { }
 
 template<typename T, std::size_t V>
 Fifo<T, V>::~Fifo() = default;
