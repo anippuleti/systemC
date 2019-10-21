@@ -5,16 +5,16 @@
 VERBOSITY := 0
 
 run: build
-	./sim $(VERBOSITY)
+	./lab0 $(VERBOSITY)
 
 debug: debugbuild
-	./sim $(VERBOSITY)
+	./lab0 $(VERBOSITY)
 
 clean:
-	rm -Rf sim
+	rm -Rf lab0
 #If c++ does not exist on your program (/usr/bin/c++ does not exist) then change it to g++
 build:
-	c++ -Wall -I${SYSTEMC_HOME}/include -L${SYSTEMC_HOME}/lib-release -o sim src/hello_world.cpp src/tb_top.cpp -lsystemc -Wl,-rpath,${SYSTEMC_HOME}/lib-release
+	c++ -Wall -std=c++14 -I${SYSTEMC_HOME}/include -L${SYSTEMC_HOME}/lib-release -o lab0 src/hello_world.cpp src/tb_top.cpp -lsystemc -Wl,-rpath,${SYSTEMC_HOME}/lib-release
 
 debugbuild:
-	c++ -g3 -Wall -I${SYSTEMC_HOME}/include -L${SYSTEMC_HOME}/lib-debug -o sim src/hello_world.cpp src/tb_top.cpp -lsystemc -Wl,-rpath,${SYSTEMC_HOME}/lib-debug
+	c++ -g3 -Wall  -std=c++14 -I${SYSTEMC_HOME}/include -L${SYSTEMC_HOME}/lib-debug -o lab0 src/hello_world.cpp src/tb_top.cpp -lsystemc -Wl,-rpath,${SYSTEMC_HOME}/lib-debug
