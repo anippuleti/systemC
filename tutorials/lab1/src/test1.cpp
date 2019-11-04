@@ -22,34 +22,10 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
-
 #include "fifo.h"
+#include "packet.h"
 #include "sysc/kernel/sc_spawn_options.h"
 #include "sysc/kernel/sc_spawn.h"
-
-enum class Cmd {Read, Write};
-
-struct Packet {
-  inline Packet() = default;
-  inline Packet(u_int64_t a, u_int32_t i, Cmd c):
-      addr{a},
-      id{i},
-      cmd{c}
-  { }
-
-  friend std::ostream& operator<<(std::ostream&, Packet const& );
-
-  u_int64_t addr{0};
-  u_int32_t  id{0};
-  Cmd       cmd{Cmd::Read};
-};
-
-std::ostream& operator<<(std::ostream& os, Packet const& pkt)
-{
-  std::string s =  pkt.cmd == Cmd::Read ? " Cmd: Read" : " Cmd: Write";
-  return os << sc_core::sc_time_stamp() << " addr: " << pkt.addr
-            << " id: " << pkt.id << s << '\n';
-}
 
 struct Test1 {
   Fifo<Packet, 8> m_fifo{"t1_event_fifo"};
@@ -60,6 +36,7 @@ struct Test1 {
     set_full_spawn();
     set_empty_spawn();
     sc_core::sc_start(0, sc_core::sc_time_unit::SC_NS);
+    m_fifo.trigger_reset();
     for (auto i = 0; i < MXSZ; ++i) {
       sc_core::sc_start(5, sc_core::sc_time_unit::SC_NS);
       auto p = Packet{

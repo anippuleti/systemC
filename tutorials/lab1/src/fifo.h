@@ -23,8 +23,8 @@
 //SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef LAB1_FIFO_H
-#define LAB1_FIFO_H
+#ifndef FIFO_H
+#define FIFO_H
 
 #include <vector>
 #include "systemc"
@@ -122,6 +122,8 @@ void Fifo<T,V>::push_element(T&& p)
     trigger_almost_full();
   else if (fifo.size() == V)
     trigger_full();
+  else if (fifo.size() == 1)
+    trigger_almost_empty();
 }
 
 template<typename T, std::size_t V>
@@ -136,6 +138,8 @@ T Fifo<T, V>::get_element()
     trigger_empty();
   else if (fifo.size() == 1)
     trigger_almost_empty();
+  else if (fifo.size() == V - 1)
+    trigger_almost_full();
 
   return p;
 }
@@ -176,4 +180,4 @@ void Fifo<T,V>::trigger_empty() noexcept
   empty.notify();
 }
 
-#endif //LAB1_FIFO_H
+#endif //FIFO_H
