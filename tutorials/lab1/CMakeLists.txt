@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.12)
 project(test1 VERSION 1.0 LANGUAGES CXX DESCRIPTION "SystemC practice")
 
 #Current SystemC library supports C++11 and C++14,

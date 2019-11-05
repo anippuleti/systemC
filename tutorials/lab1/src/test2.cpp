@@ -37,8 +37,12 @@ class Test2 : public sc_core::sc_module {
   explicit Test2(sc_core::sc_module_name const& s);
   ~Test2() final;
 
-  void run_simulation();
+
+  void end_of_elaboration() final;
+  void start_of_simulation() final;
   void end_of_simulation() final;
+
+  void run_simulation();
 
  private:
   Fifo<Packet, 48> m_fifo;
@@ -82,37 +86,74 @@ void Test2::run_simulation()
   set_test_cbs();
   std::pair<unsigned, unsigned> clk_periods;
 
+  //Run for 10 msec
   for (uint64_t i = 0; i < SIMTIME; ++i) {
     if (i % 256 == 0)
       clk_periods = gen_clk_periods();
+
+    if (i % clk_periods.first == 0)
+      puh_clk.notify();
+
+    if (i % clk_periods.second == 0)
+      pop_clk.notify();
+
+    //All pending immediate events are triggered on invocation of sc_start()
+    //Events triggered by invocation of the notify() are processed before incrementing the simulation.
+    //Also if multiple events are triggered, order of events processed is un-deterministic .
     sc_core::sc_start(1, sc_core::sc_time_unit::SC_NS);
 
-    if (i % clk_periods.first == 0) {
-      puh_clk.notify();
-      if (is_fifo_push_rdy == Ready::ASSERTED) {
-        push_pkts_into_fifo();
-        ++push_count;
-      }
+    if (is_fifo_push_rdy == Ready::ASSERTED) {
+      push_pkts_into_fifo();
+      ++push_count;
+      is_fifo_push_rdy = Ready::DEASSERTED;
     }
 
-    if (i % clk_periods.second == 0) {
-      pop_clk.notify();
-      if (is_fifo_pop_rdy == Ready::ASSERTED) {
-        pop_pkts_outof_fifo();
-        ++pop_count;
-      }
+    if (is_fifo_pop_rdy == Ready::ASSERTED) {
+      pop_pkts_outof_fifo();
+      ++pop_count;
+      is_fifo_pop_rdy = Ready::DEASSERTED;
     }
   }
+
+  //Run until all Transactions are poped out
+  auto lpcnt = 0;
+  while (m_fifo.get_size() > 0 ) {
+    if (lpcnt % clk_periods.second == 0)
+      pop_clk.notify();
+
+    sc_core::sc_start(1, sc_core::sc_time_unit::SC_NS);
+    if (is_fifo_pop_rdy == Ready::ASSERTED) {
+      pop_pkts_outof_fifo();
+      ++pop_count;
+      is_fifo_pop_rdy = Ready::DEASSERTED;
+    }
+    ++lpcnt;
+  }
+  sc_core::sc_start(1, sc_core::sc_time_unit::SC_NS);
+}
+
+void Test2::end_of_elaboration()
+{
+  using namespace sc_core;
+  std::cout << sc_time_stamp() << " End of Elaboration invoked" << "\n";
+}
+void Test2::start_of_simulation()
+{
+  using namespace sc_core;
+  std::cout << sc_time_stamp() << " Start of Simulation invoked" << "\n";
 }
 
 void Test2::end_of_simulation()
 {
-  std::cout << "Total packets pushed into FIFO: " << push_count << "\n";
-  std::cout << "Total packets poped  from FIFO: " << pop_count  << std::endl;
+  using namespace sc_core;
+  std::cout << sc_time_stamp() << " End of Simulation invoked" << "\n";
+  std::cout << sc_time_stamp() << " Total packets pushed into FIFO: " << push_count << "\n";
+  std::cout << sc_time_stamp() << " Total packets poped  from FIFO: " << pop_count  << "\n";
 }
 
 void Test2::set_dut_cbs()
 {
+  using namespace sc_core;
   { //Full
     sc_core::sc_spawn_options opts;
     opts.spawn_method();
@@ -120,6 +161,7 @@ void Test2::set_dut_cbs()
     opts.set_sensitivity(&m_fifo.get_full_e());
     auto lmd = [this]() -> void {
       this->is_full = true;
+      std::cout <<  sc_time_stamp() << " FIFO Full triggered" << "\n";
     };
 
     sc_core::sc_spawn(lmd, "Full_lmd1", &opts);
@@ -132,6 +174,7 @@ void Test2::set_dut_cbs()
     opts.set_sensitivity(&m_fifo.get_almost_full_e());
     auto lmd = [this]() -> void {
       this->is_full = false;
+      std::cout << sc_time_stamp() << " FIFO Almost Full triggered" << "\n";
     };
 
     sc_core::sc_spawn(lmd, "Full_lmd2", &opts);
@@ -144,6 +187,7 @@ void Test2::set_dut_cbs()
     opts.set_sensitivity(&m_fifo.get_empty_e());
     auto lmd = [this]() -> void {
       this->is_empty = true;
+      std::cout << sc_time_stamp() << " FIFO Empty triggered" << "\n";
     };
 
     sc_core::sc_spawn(lmd, "Empty_lmd1", &opts);
@@ -156,6 +200,7 @@ void Test2::set_dut_cbs()
     opts.set_sensitivity(&m_fifo.get_almost_empty_e());
     auto lmd = [this]() -> void {
       this->is_empty = false;
+      std::cout << sc_time_stamp() << " FIFO Almost Empty triggered" << "\n";
     };
 
     sc_core::sc_spawn(lmd, "Empty_lmd2", &opts);
@@ -192,7 +237,9 @@ std::pair<unsigned, unsigned> Test2::gen_clk_periods()
 
 void Test2::push_pkts_into_fifo()
 {
-  m_fifo.push_element(Packet{t_push_addr, 0, Cmd::Read});
+  auto p = Packet{t_push_addr, 0, Cmd::Read};
+  std::cout << "Push Packet: " << p;
+  m_fifo.push_element(std::move(p));
   t_push_addr = t_push_addr + 64;
 }
 
@@ -200,7 +247,7 @@ void Test2::pop_pkts_outof_fifo()
 {
   auto p = m_fifo.get_element();
   assert(p.addr == t_pop_addr);
-  std::cout << p << "\n";
+  std::cout << "Pop Packet: " << p;
   t_pop_addr = t_pop_addr + 64;
 }
 
@@ -210,8 +257,11 @@ void Test2::pop_pkts_outof_fifo()
 ////////////////
 int sc_main(int argv, char* argc[])
 {
+  std::cout << "TEST2 Start" << "\n";
   Test2 m_test{sc_core::sc_module_name{"Test2"}};
+  std::cout << "Initiating Elaboration Phase" << "\n";
   sc_core::sc_start(0, sc_core::sc_time_unit::SC_NS);
+  std::cout << "Starting Test Sequence" << "\n";
   try {
     m_test.run_simulation();
   } catch (std::runtime_error& e) {
@@ -219,5 +269,8 @@ int sc_main(int argv, char* argc[])
     return EXIT_FAILURE;
   }
 
+  std::cout << "End of Test Sequence" << "\n";
+  sc_core::sc_stop();
+  std::cout << "Test End" << "\n";
   return 0;
 }
