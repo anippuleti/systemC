@@ -2,8 +2,8 @@
 #MakeFile
 ###################
 
-CC           := c++
-SYSTEMC_HOME := /home/anippuleti/lib/systemc/systemc-2.3.3
+CC           := g++
+SYSTEMC_HOME := /home/anippuleti/libs/systemc/systemc-2.3.3
 CPPFLAGS     := -Wall -std=c++14 -I $(SYSTEMC_HOME)/include
 VPATH        := src
 LIBS_PATH    := -L$(SYSTEMC_HOME)/lib-release -Wl,-rpath,${SYSTEMC_HOME}/lib-release
