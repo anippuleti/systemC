@@ -15,7 +15,7 @@ DLIBS_PATH   := -L$(SYSTEMC_HOME)/lib-debug -Wl,-rpath,${SYSTEMC_HOME}/lib-debug
 build: hello_world.cpp tb_top.cpp 
 	$(CC) $(CPPFLAGS) $(LIBS_PATH) $^ -lsystemc -o lab0
 
-debug: hello_world.cpp tb_top.cpp 
+debug: hello_world.cpp tb_top.cpp
 	$(CC) $(DCPPFLAGS) $(DLIBS_PATH) $^ -lsystemc -o lab0
 
 .PHONY: clean
@@ -27,4 +27,6 @@ run: build
 
 dbg: debug
 	./lab0 $(VERBOSITY)
+
+all: run
 

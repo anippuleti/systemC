@@ -31,7 +31,7 @@
 #include "packet.h"
 #include "test2_trigger.h"
 
-class Test2 : public sc_core::sc_module {
+class Test2 final : public sc_core::sc_module {
  public:
 
   explicit Test2(sc_core::sc_module_name const& s);
